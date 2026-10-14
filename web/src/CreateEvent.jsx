@@ -18,7 +18,7 @@ export default function CreateEvent() {
   function validate() {
     if (!f.title.trim()) return 'Give the event a title.';
     if (f.end_date < f.start_date) return 'End date is before the start date.';
-    if (f.day_end <= f.day_start) return 'The daily window must end after it starts.';
+    if (f.day_end === f.day_start) return 'Day start and end must differ.';
     return '';
   }
   async function submit(e) {

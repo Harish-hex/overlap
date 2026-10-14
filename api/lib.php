@@ -36,6 +36,12 @@ function minutes(string $hhmm): int {
 }
 
 function find_event(string $slug): array {
+/** Length of the daily window in minutes. An end at or before the start wraps past midnight (23:00-03:00 = 240). */
+function window_minutes(string $start, string $end): int {
+    $w = minutes($end) - minutes($start);
+    return $w <= 0 ? $w + 1440 : $w;
+}
+
     $st = db()->prepare('SELECT * FROM events WHERE slug = ?');
     $st->execute([$slug]);
     return $st->fetch() ?: fail('Event not found', 404);
@@ -44,7 +50,7 @@ function find_event(string $slug): array {
 /** Grid geometry. slot_index = dayIdx * perDay + slotInDay. */
 function grid(array $e): array {
     $days = (int) ((strtotime($e['end_date']) - strtotime($e['start_date'])) / 86400) + 1;
-    $perDay = intdiv(minutes($e['day_end']) - minutes($e['day_start']), (int) $e['slot_minutes']);
+    $perDay = intdiv(window_minutes($e['day_start'], $e['day_end']), (int) $e['slot_minutes']);
     return ['days' => $days, 'perDay' => $perDay, 'total' => $days * $perDay,
             'k' => intdiv((int) $e['meeting_length'], (int) $e['slot_minutes'])];
 }

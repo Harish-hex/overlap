@@ -84,7 +84,7 @@ export default function Dashboard({ slug, token }) {
             const m = mins(ev.day_start) + r * ev.slot_minutes;
             return (
               <React.Fragment key={r}>
-                <div className="tl">{fmtTime(m)}</div>
+                <div className="tl">{fmtTime(m)}{m >= 1440 ? ' +1' : ''}</div>
                 {Array.from({ length: g.days }, (_, d) => {
                   const s = d * g.perDay + r;
                   const names = heat.slots[s] || [];

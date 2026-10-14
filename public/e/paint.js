@@ -25,7 +25,7 @@
   }
   function pad(n) { return (n < 10 ? '0' : '') + n; }
   function mins(t) { var p = t.split(':'); return +p[0] * 60 + +p[1]; }
-  function fmtTime(m) { return pad(Math.floor(m / 60)) + ':' + pad(m % 60); }
+  function fmtTime(m) { return pad(Math.floor((m % 1440) / 60)) + ':' + pad(m % 60); }
   function dayDate(i) { return new Date(Date.parse(ev.start_date + 'T00:00:00Z') + i * 864e5); }
   function dayLabel(i, long) {
     return dayDate(i).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric', timeZone: 'UTC' });
@@ -36,7 +36,7 @@
   }
   function rangeLabel(s) {
     var g = ev.grid, m = slotTime(s);
-    return dayLabel(Math.floor(s / g.perDay)) + ', ' + fmtTime(m) + '–' + fmtTime(m + ev.meeting_length) + ' (' + ev.timezone + ')';
+    return dayLabel(Math.floor(s / g.perDay) + Math.floor(m / 1440)) + ', ' + fmtTime(m) + '–' + fmtTime(m + ev.meeting_length) + ' (' + ev.timezone + ')';
   }
 
   function render(node) { app.textContent = ''; app.appendChild(node); }
@@ -124,7 +124,7 @@
     }
     for (var r = 0; r < g.perDay; r++) {
       var m = mins(ev.day_start) + r * ev.slot_minutes;
-      grid.appendChild(el('div', { 'class': 'tl', text: (m % 60 === 0 || ev.slot_minutes < 60) ? fmtTime(m) : '' }));
+      grid.appendChild(el('div', { 'class': 'tl', text: ((m % 60 === 0 || ev.slot_minutes < 60) ? fmtTime(m) : '') + (m >= 1440 ? ' +1' : '') }));
       for (var d2 = 0; d2 < g.days; d2++) {
         var s = d2 * g.perDay + r;
         var c = el('button', { type: 'button', 'class': 'cell' + (selected.has(s) ? ' on' : ''), 'data-slot': s,

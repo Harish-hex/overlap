@@ -22,8 +22,8 @@ if ($method === 'POST' && $path === '/events') {
     if ($de < $ds) fail('End date is before start date');
     if ((strtotime($de) - strtotime($ds)) / 86400 > 30) fail('Date range is limited to 31 days');
     if (!in_array($slot, [15, 30, 60], true)) fail('Slot size must be 15, 30 or 60 minutes');
-    $win = minutes($te) - minutes($ts);
-    if ($win <= 0) fail('Daily window must end after it starts');
+    if ($ts === $te) fail('Daily window start and end must differ');
+    $win = window_minutes($ts, $te); // end before start = overnight window
     if ($win % $slot) fail('Daily window must be a multiple of the slot size');
     if ($len < $slot || $len % $slot) fail('Meeting length must be a multiple of the slot size');
     if ($len > $win) fail('Meeting is longer than the daily window');
